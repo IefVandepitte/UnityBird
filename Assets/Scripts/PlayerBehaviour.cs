@@ -7,11 +7,13 @@ public class PlayerBehaviour : MonoBehaviour
     public GameObject[] pathNode;
     public GameObject player;
     public float moveSpeed;
+    public UnityEngine.UI.Text countText;
 
     private float _timer;
     private static Vector3 _nextPositionHolder;
     private int _currentNode;
     private Vector3 _startposition;
+    private int _score;
 
     // Start is called before the first frame update
     void Start()
@@ -23,6 +25,7 @@ public class PlayerBehaviour : MonoBehaviour
     void LateUpdate()
     {
         _timer += Time.deltaTime * moveSpeed;
+        _nextPositionHolder.y = _nextPositionHolder.y <= 0.01f ? _nextPositionHolder.y = 0 : _nextPositionHolder.y += -0.01f;
 
         if (Input.GetKeyDown("space"))
         {
@@ -72,11 +75,33 @@ public class PlayerBehaviour : MonoBehaviour
         _timer = 0;
         _startposition = player.transform.position;
         _nextPositionHolder = pathNode[_currentNode].transform.position;
-        //Debug.Log("#####################################");
-        //Debug.Log($"pathnodelength:{pathNode.Length}");
-        //Debug.Log($"timer: {_timer}");
-        //Debug.Log($"Startposition: {_startposition}");
-        //Debug.Log($"currentposition: {_currentPositionHolder}");
-        //Debug.Log($"currentnode: {_currentNode}");
+        
+    }
+
+    void OnTriggerEnter (Collider other)
+    {
+        switch (other.gameObject.tag)
+        {
+            case "CrashObject":
+                print("crashed");
+                break;
+            case "Floor":
+                print("landed");
+                _nextPositionHolder.y += 1f;
+                break;
+            case "ScoreObject":
+                _score++;
+                print($"Scored, points: {_score}");
+                CountText();
+                break;
+            default:
+                break;
+        }
+       
+    }
+
+    void CountText()
+    {
+        countText.text = $"Score: {_score.ToString()}";
     }
 }
