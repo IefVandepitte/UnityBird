@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerBehaviour : MonoBehaviour
 {
     public GameObject[] pathNode;
     public GameObject player;
     public float moveSpeed;
-    public UnityEngine.UI.Text countText;
+    public Text countText;
 
     private float _timer;
     private static Vector3 _nextPositionHolder;
@@ -83,15 +85,16 @@ public class PlayerBehaviour : MonoBehaviour
         switch (other.gameObject.tag)
         {
             case "CrashObject":
-                print("crashed");
+                //print("crashed");
+                GameOver();
                 break;
             case "Floor":
-                print("landed");
+                //print("landed");
                 _nextPositionHolder.y += 1f;
                 break;
             case "ScoreObject":
                 _score++;
-                print($"Scored, points: {_score}");
+                //print($"Scored, points: {_score}");
                 CountText();
                 break;
             default:
@@ -103,5 +106,27 @@ public class PlayerBehaviour : MonoBehaviour
     void CountText()
     {
         countText.text = $"Score: {_score.ToString()}";
+    }
+
+    void GameOver()
+    {
+        SetScore();
+        SceneManager.LoadScene("EndScreen");        
+    }
+
+    void SetScore()
+    {
+        print("ScoreSetting");
+        print(PlayerPrefs.GetInt("highscore"));
+
+        PlayerPrefs.SetInt("score", _score);
+        print($"score set: {PlayerPrefs.GetInt("score")}");
+
+        if (PlayerPrefs.GetInt("highscore") != 0)
+        {
+            var currentHighScore = PlayerPrefs.GetInt("highscore");
+            currentHighScore = currentHighScore < _score ? _score : currentHighScore;
+        }
+        else PlayerPrefs.SetInt("highscore", _score);
     }
 }
